@@ -14,14 +14,6 @@ O objetivo é construir um fluxo reproduzível: entrada da fotografia, validaç�
 
 Nenhum filtro é declarado superior sem um experimento que sustente essa conclusão. A limiarização é uma demonstração acadêmica e não determina que uma região seja plástico.
 
-## Equipe e divisão do trabalho
-
-| Integrante | Responsabilidade principal | Módulos de referência |
-| --- | --- | --- |
-| Eduardo | Processamento das imagens e integração do sistema | `processamento/`, `app.py` |
-| Ryan | Organização e anotação do dataset, configuração, treinamento e avaliação do YOLO | `dataset/`, `modelo/dados.py`, `modelo/treinamento.py`, `modelo/avaliacao.py` |
-| Bárbara | Interface, testes de utilização e apresentação dos resultados | `interface/`, `tests/`, documentação |
-
 As funções de processamento não dependem do Streamlit nem de um modelo treinado. O detector não depende da interface. A aplicação conecta esses módulos por contratos explícitos, permitindo trabalho independente e revisão conjunta da integração.
 
 ## Tecnologias
