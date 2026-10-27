@@ -1,0 +1,8 @@
+# Caminhos relativos a este YAML. Os scripts normalizam antes de chamar YOLO.
+path: .
+train: images/train
+val: images/val
+test: images/test
+nc: 1
+names:
+  0: plastico
