@@ -39,7 +39,6 @@ def etapa_deteccao(imagem, dados: bytes, nome: str, processadas: dict, parametro
 
 def main() -> None:
     st.title("Detecção de Resíduos Plásticos em Praias e Rios")
-    st.subheader("APS — Processamento de Imagens e Visão Computacional")
     entrada = entrada_imagem()
     if entrada is not None:
         imagem, dados, nome = entrada
@@ -51,10 +50,10 @@ def main() -> None:
         except (ValueError, OSError, RuntimeError) as exc:
             st.error(f"Não foi possível concluir a operação: {exc}")
     else:
-        st.header("Etapa 3 — Detecção")
+        st.header("Etapa 2 — Detecção")
         if not list((RAIZ / "modelos").glob("*.pt")):
             st.info(MENSAGEM_SEM_MODELO)
-    informacoes_academicas()
+    informacoes_academicas(etapa=4 if entrada is not None else 3)
 
 
 if __name__ == "__main__":

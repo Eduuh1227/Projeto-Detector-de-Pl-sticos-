@@ -152,7 +152,9 @@ Os exemplos seguintes pressupõem o ambiente virtual ativo. No Windows, também 
 1. **Upload:** selecione um JPG, JPEG ou PNG. O conteúdo é decodificado e validado; apenas renomear um arquivo para `.png` não o torna uma imagem válida. O limite é de 20 MB e 24 megapixels. A fotografia original e suas dimensões são mostradas. PNG com transparência é composto sobre fundo branco.
 2. **Processamento:** compare a imagem de referência, o filtro Gaussiano e o filtro de mediana. Altere o tamanho do kernel. Explore a escala de cinza, a limiarização manual ou Otsu e as operações de abertura e fechamento. O histograma de intensidades pode ser ativado.
 3. **Detecção:** se não houver pesos personalizados, a interface informa que o modelo ainda não foi treinado. Se houver um arquivo `.pt` na pasta `modelos/`, selecione-o, ajuste os parâmetros e clique em **Detectar resíduos**. O carregamento verifica a compatibilidade das classes antes da inferência.
-4. **Informações acadêmicas:** consulte a distinção entre processamento e detecção, o escopo e as responsabilidades da equipe.
+4. **Informações acadêmicas:** consulte a distinção entre processamento e detecção e o escopo do sistema.
+
+A numeração acompanha as etapas visíveis: antes do upload, aparecem Upload (1), Detecção (2) e Informações acadêmicas (3). Após enviar uma imagem válida, Processamento é inserido como etapa 2, seguido por Detecção (3) e Informações acadêmicas (4).
 
 A comparação de processamento usa uma versão proporcional com até **1600 pixels no maior lado**, sem ampliar imagens menores. A inferência recebe a imagem original decodificada, sem os filtros comparativos. Por isso, as caixas retornadas correspondem aos pixels da imagem original, e não à resolução de exibição.
 

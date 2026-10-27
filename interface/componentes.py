@@ -99,8 +99,8 @@ def mostrar_processamento(imagem: Imagem) -> tuple[dict[str, Imagem], dict]:
     return imagens, parametros
 
 
-def informacoes_academicas() -> None:
-    st.header("Etapa 4 — Informações acadêmicas")
+def informacoes_academicas(etapa: int = 3) -> None:
+    st.header(f"Etapa {etapa} — Informações acadêmicas")
     if os.getenv("APS_HOSPEDADO") == "1":
         st.caption("Nesta versão online, a sessão é temporária. Baixe os resultados antes de "
                    "fechar ou recarregar a página.")
@@ -110,7 +110,3 @@ def informacoes_academicas() -> None:
              "convencionais e não foi projetado para detecção de microplásticos.")
     st.caption("O desempenho depende dos dados anotados e precisa ser medido em imagens "
                "independentes. Confiança de uma detecção não representa acurácia do sistema.")
-    with st.expander("Equipe e responsabilidades"):
-        st.markdown("- **Eduardo:** processamento das imagens e integração.\n"
-                    "- **Ryan:** dataset, configuração, treinamento e avaliação do YOLO.\n"
-                    "- **Bárbara:** interface, testes de utilização e apresentação dos resultados.")

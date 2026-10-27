@@ -22,6 +22,10 @@ def test_app_abre_sem_upload_e_sem_modelo(app_temporario):
     app = AppTest.from_file(str(app_temporario), default_timeout=20).run()
     assert not app.exception
     assert app.title[0].value == "Detecção de Resíduos Plásticos em Praias e Rios"
+    assert [item.value for item in app.header] == [
+        "Etapa 1 — Upload", "Etapa 2 — Detecção", "Etapa 3 — Informações acadêmicas"]
+    assert not app.subheader
+    assert not any(item.label == "Equipe e responsabilidades" for item in app.expander)
     assert any("Modelo de detecção ainda não treinado" in item.value for item in app.info)
     assert any("microplásticos" in item.value for item in app.markdown)
     assert not app.metric
@@ -55,6 +59,9 @@ def test_fluxo_processamento_parametros_e_histograma(monkeypatch, app_temporario
     app = AppTest.from_file(str(app_temporario), default_timeout=20).run()
     assert not app.exception
     assert not app.error
+    assert [item.value for item in app.header] == [
+        "Etapa 1 — Upload", "Etapa 2 — Processamento", "Etapa 3 — Detecção",
+        "Etapa 4 — Informações acadêmicas"]
     assert any("ela não identifica plástico" in item.value for item in app.warning)
     assert any("Modelo de detecção ainda não treinado" in item.value for item in app.info)
     assert not app.metric
