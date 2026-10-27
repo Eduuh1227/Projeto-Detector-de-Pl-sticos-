@@ -2,14 +2,27 @@
 
 import hashlib
 import json
+import os
 from pathlib import Path
 
 import streamlit as st
 
 from modelo.detector import DetectorPlastico, ErroModelo
-from modelo.resultados import codificar_png, montar_relatorio, salvar_resultado
+from modelo.resultados import codificar_png, empacotar_resultado, montar_relatorio, salvar_resultado
 from processamento.preprocessamento import Imagem
 from .componentes import mostrar_bgr
+
+
+def _oferecer_download(rotulo: str, conteudo: bytes | str, *, arquivo: str,
+                      mime: str, hospedado: bool) -> None:
+    """Evita anunciar downloads que ultrapassariam o limite da hospedagem."""
+    tamanho = len(conteudo.encode("utf-8") if isinstance(conteudo, str) else conteudo)
+    if hospedado and tamanho > 4 * 1024 * 1024:
+        st.info(f"O arquivo {arquivo} ultrapassa o limite de 4 MB desta versão online. "
+                "Baixe as outras opções disponíveis ou reduza a resolução da fotografia "
+                "para gerar o pacote completo. A versão local mantém os arquivos sem esse limite.")
+        return
+    st.download_button(rotulo, conteudo, file_name=arquivo, mime=mime)
 
 
 def mostrar_deteccao(imagem: Imagem, dados: bytes, nome: str,
@@ -54,18 +67,30 @@ def mostrar_deteccao(imagem: Imagem, dados: bytes, nome: str,
                       for numero, item in enumerate(resultado.deteccoes, start=1)],
                      hide_index=True, use_container_width=True)
     st.caption("Confiança é o escore retornado pelo modelo para esta detecção; não é acurácia.")
-    if st.button("Salvar imagens e informações em resultados/"):
+    hospedado = os.getenv("APS_HOSPEDADO") == "1"
+    if hospedado:
         try:
-            caminho_json = salvar_resultado(resultado, processadas, dados, nome, parametros, raiz / "resultados")
-            st.session_state["arquivo_salvo"] = str(caminho_json.relative_to(raiz))
+            pacote = empacotar_resultado(resultado, processadas, dados, nome, parametros)
+            _oferecer_download("Baixar todas as imagens e informações (ZIP)", pacote,
+                                arquivo="resultados_plasticos.zip", mime="application/zip",
+                                hospedado=hospedado)
         except (OSError, ValueError) as exc:
-            st.error(f"Não foi possível salvar os resultados: {exc}")
-    if st.session_state.get("arquivo_salvo"):
-        st.success(f"Resultado salvo em: {st.session_state['arquivo_salvo']}")
+            st.error(f"Não foi possível preparar o download dos resultados: {exc}")
+    else:
+        if st.button("Salvar imagens e informações em resultados/"):
+            try:
+                caminho_json = salvar_resultado(resultado, processadas, dados, nome, parametros, raiz / "resultados")
+                st.session_state["arquivo_salvo"] = str(caminho_json.relative_to(raiz))
+            except (OSError, ValueError) as exc:
+                st.error(f"Não foi possível salvar os resultados: {exc}")
+        if st.session_state.get("arquivo_salvo"):
+            st.success(f"Resultado salvo em: {st.session_state['arquivo_salvo']}")
     relatorio = montar_relatorio(resultado, dados, nome, parametros)
     esquerda, direita = st.columns(2)
-    esquerda.download_button("Baixar imagem com detecções", codificar_png(resultado.imagem_bgr),
-                              file_name="deteccoes.png", mime="image/png")
-    direita.download_button("Baixar informações JSON",
-                             json.dumps(relatorio, ensure_ascii=False, indent=2, allow_nan=False),
-                             file_name="deteccoes.json", mime="application/json")
+    with esquerda:
+        _oferecer_download("Baixar imagem com detecções", codificar_png(resultado.imagem_bgr),
+                            arquivo="deteccoes.png", mime="image/png", hospedado=hospedado)
+    with direita:
+        _oferecer_download("Baixar informações JSON",
+                            json.dumps(relatorio, ensure_ascii=False, indent=2, allow_nan=False),
+                            arquivo="deteccoes.json", mime="application/json", hospedado=hospedado)

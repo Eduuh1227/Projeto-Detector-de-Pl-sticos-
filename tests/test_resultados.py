@@ -1,14 +1,17 @@
 """Resultados de doubles em tmp_path verificam persistência, não métricas/detecções reais."""
 
 import hashlib
+from io import BytesIO
 import json
+from pathlib import Path
+from zipfile import ZipFile
 
 import numpy as np
 import pytest
 
 from modelo import resultados as modulo
 from modelo.detector import Deteccao, ResultadoDeteccao
-from modelo.resultados import codificar_png, montar_relatorio, salvar_resultado
+from modelo.resultados import codificar_png, empacotar_resultado, montar_relatorio, salvar_resultado
 from processamento.preprocessamento import carregar_imagem
 
 
@@ -65,3 +68,36 @@ def test_falha_no_salvamento_remove_apenas_arquivos_da_chamada(monkeypatch, tmp_
     assert anterior.read_text(encoding="utf-8") == "resultado anterior"
     assert not list(tmp_path.rglob("*.png"))
     assert not list(tmp_path.rglob("*.json"))
+
+
+def test_zip_em_memoria_preserva_arquivos_e_referencias_sem_escrever_disco(
+        monkeypatch, imagem_bgr, png_bytes):
+    """Empacotamento de contrato com pixels técnicos, sem conteúdo científico."""
+    resultado = ResultadoDeteccao(imagem_bgr, [], {"origem": "double_unitario"})
+
+    def escrita_proibida(*args, **kwargs):
+        raise AssertionError("O download hospedado não deve abrir arquivos no disco.")
+
+    with monkeypatch.context() as contexto:
+        contexto.setattr(Path, "open", escrita_proibida)
+        contexto.setattr("builtins.open", escrita_proibida)
+        dados = empacotar_resultado(resultado, {"gaussiano": imagem_bgr}, png_bytes,
+                                   "../nome_original.png", {"otsu": True})
+    with ZipFile(BytesIO(dados)) as pacote:
+        assert pacote.testzip() is None
+        assert set(pacote.namelist()) == {"original.png", "deteccoes.png", "deteccoes.json", "filtros/gaussiano.png"}
+        assert pacote.read("original.png") == png_bytes
+        assert np.array_equal(carregar_imagem(pacote.read("deteccoes.png")), imagem_bgr)
+        relatorio = json.loads(pacote.read("deteccoes.json"))
+        assert relatorio["quantidade"] == 0
+        assert relatorio["arquivo_original"] == "nome_original.png"
+        assert relatorio["sha256_arquivo_original"] == hashlib.sha256(png_bytes).hexdigest()
+        assert relatorio["imagens_processadas"] == ["filtros/gaussiano.png"]
+        assert all(caminho in pacote.namelist() for caminho in relatorio["imagens_processadas"])
+
+
+@pytest.mark.parametrize("nome", ["../fora", "subpasta/imagem", ""])
+def test_zip_rejeita_nomes_nao_permitidos(nome, imagem_bgr, png_bytes):
+    resultado = ResultadoDeteccao(imagem_bgr, [], {})
+    with pytest.raises(ValueError):
+        empacotar_resultado(resultado, {nome: imagem_bgr}, png_bytes, "fixture.png", {})

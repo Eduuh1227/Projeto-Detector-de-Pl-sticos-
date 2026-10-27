@@ -2,9 +2,11 @@
 
 from datetime import datetime, timezone
 import hashlib
+from io import BytesIO
 import json
 from pathlib import Path
 from uuid import uuid4
+from zipfile import ZIP_DEFLATED, ZipFile
 
 import cv2
 
@@ -32,13 +34,39 @@ def montar_relatorio(resultado: ResultadoDeteccao, arquivo_original: bytes,
             "observacao": "Confiança do modelo não é acurácia. Segmentação não identifica plástico."}
 
 
+def _validar_processadas(processadas: dict[str, Imagem]) -> None:
+    permitidas = {"original_comparacao", "gaussiano", "mediana", "segmentacao"}
+    if not set(processadas).issubset(permitidas) or not processadas:
+        raise ValueError("Informe as imagens produzidas pela etapa de processamento.")
+
+
+def empacotar_resultado(resultado: ResultadoDeteccao, processadas: dict[str, Imagem],
+                       arquivo_original: bytes, nome_original: str, parametros: dict) -> bytes:
+    """Cria um ZIP em memória para download, sem gravar no disco do servidor.
+
+    O JSON fica na raiz do pacote e seus caminhos de imagens são relativos a
+    essa raiz. Os nomes de entrada são controlados, nunca derivados do upload.
+    """
+    _validar_processadas(processadas)
+    extensao = ".png" if arquivo_original.startswith(b"\x89PNG") else ".jpg"
+    relatorio = montar_relatorio(resultado, arquivo_original, nome_original, parametros)
+    relatorio["imagens_processadas"] = [f"filtros/{nome}.png" for nome in processadas]
+    dados_json = json.dumps(relatorio, ensure_ascii=False, indent=2, allow_nan=False).encode("utf-8")
+    buffer = BytesIO()
+    with ZipFile(buffer, "w", compression=ZIP_DEFLATED) as pacote:
+        pacote.writestr(f"original{extensao}", arquivo_original)
+        pacote.writestr("deteccoes.png", codificar_png(resultado.imagem_bgr))
+        for nome, imagem in processadas.items():
+            pacote.writestr(f"filtros/{nome}.png", codificar_png(imagem))
+        pacote.writestr("deteccoes.json", dados_json)
+    return buffer.getvalue()
+
+
 def salvar_resultado(resultado: ResultadoDeteccao, processadas: dict[str, Imagem],
                      arquivo_original: bytes, nome_original: str, parametros: dict,
                      diretorio: Path) -> Path:
     """Salva imagens e JSON sem sobrescrever; inclusive inferências reais sem objetos."""
-    permitidas = {"original_comparacao", "gaussiano", "mediana", "segmentacao"}
-    if not set(processadas).issubset(permitidas) or not processadas:
-        raise ValueError("Informe as imagens produzidas pela etapa de processamento.")
+    _validar_processadas(processadas)
     identificador = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S_%fZ") + "_" + uuid4().hex[:10]
     deteccoes_dir = diretorio / "deteccoes" / identificador
     filtros_dir = diretorio / "filtros" / identificador

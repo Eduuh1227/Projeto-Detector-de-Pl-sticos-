@@ -1,5 +1,7 @@
 """Componentes Streamlit. Não contém lógica de treinamento ou inferência."""
 
+import os
+
 import matplotlib.pyplot as plt
 import numpy as np
 import streamlit as st
@@ -10,25 +12,36 @@ from processamento.segmentacao import segmentar
 
 
 def mostrar_bgr(imagem: Imagem, legenda: str) -> None:
-    st.image(converter_cores(imagem), caption=legenda, use_container_width=True)
+    if os.getenv("APS_HOSPEDADO") == "1":
+        # Só a prévia é reduzida. Inferência e exportação usam os arrays originais.
+        previa = redimensionar(imagem, largura=1280, altura=1280)
+        st.image(converter_cores(previa), caption=legenda, use_container_width=True,
+                 output_format="JPEG")
+    else:
+        st.image(converter_cores(imagem), caption=legenda, use_container_width=True)
 
 
 def entrada_imagem() -> tuple[Imagem, bytes, str] | None:
     """Valida upload e retorna imagem BGR, bytes originais e nome do arquivo."""
     st.header("Etapa 1 — Upload")
+    limite_mb = min(20, int(st.get_option("server.maxUploadSize")))
     arquivo = st.file_uploader("Selecione uma fotografia de praia ou margem de rio",
                                type=["jpg", "jpeg", "png"])
-    st.caption("JPG, JPEG ou PNG; até 20 MB e 24 megapixels. Transparência PNG é exibida sobre branco.")
+    st.caption(f"JPG, JPEG ou PNG; até {limite_mb} MB e 24 megapixels. Transparência PNG é exibida sobre branco.")
     if arquivo is None:
         st.info("Envie uma fotografia para explorar as etapas de processamento.")
         return None
     try:
         dados = arquivo.getvalue()
+        if len(dados) > limite_mb * 1024 * 1024:
+            raise ValueError(f"Use uma imagem com até {limite_mb} MB nesta versão.")
         imagem = carregar_imagem(dados)
     except (ValueError, OSError) as exc:
         st.error(str(exc))
         return None
     mostrar_bgr(imagem, "Imagem original")
+    if os.getenv("APS_HOSPEDADO") == "1":
+        st.caption("A prévia de exibição é limitada a 1280 pixels por lado; a imagem enviada é preservada para análise.")
     st.caption(f"Resolução: {imagem.shape[1]} × {imagem.shape[0]} pixels")
     return imagem, dados, arquivo.name
 
@@ -88,6 +101,9 @@ def mostrar_processamento(imagem: Imagem) -> tuple[dict[str, Imagem], dict]:
 
 def informacoes_academicas() -> None:
     st.header("Etapa 4 — Informações acadêmicas")
+    if os.getenv("APS_HOSPEDADO") == "1":
+        st.caption("Nesta versão online, a sessão é temporária. Baixe os resultados antes de "
+                   "fechar ou recarregar a página.")
     st.write("O processamento digital prepara as imagens para análise, enquanto o modelo "
              "de visão computacional é responsável pela detecção dos resíduos plásticos.")
     st.write("O sistema identifica apenas resíduos visualmente perceptíveis em fotografias "

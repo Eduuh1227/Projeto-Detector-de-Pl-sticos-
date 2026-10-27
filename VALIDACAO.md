@@ -10,7 +10,7 @@ Este registro descreve verificações do código. Não é uma avaliação cient�
 | --- | --- |
 | Compilação dos módulos Python | Sem erros de sintaxe |
 | `python -m pip check` | Nenhum conflito de dependências encontrado |
-| Suíte completa `python -m pytest` | **117 testes aprovados**, sem falhas, em 6,44 segundos nesta execução |
+| Suíte completa `python -m pytest` | **124 testes aprovados**, sem falhas, em 16,01 segundos na revisão para hospedagem |
 | Importação real de PyTorch e Ultralytics | Concluída; PyTorch instalado para CPU |
 | Aplicação Streamlit em navegador local | Página inicial exibida com upload, aviso de modelo ausente e informações acadêmicas |
 | Treinamento com dataset vazio | Código de saída 1 e mensagem orientando adicionar/anotar fotografias; nenhum treinamento executado |
@@ -20,6 +20,8 @@ Este registro descreve verificações do código. Não é uma avaliação cient�
 Os testes incluem leitura JPG/PNG, arquivos inválidos e corrompidos, caminhos com acentos, cores, transparência, proporção, filtros, limiarização, morfologia, parâmetros inválidos, ausência de modelo, classes incompatíveis, contratos de inferência, salvamento sem sobrescrita, configuração YAML, labels, duplicatas entre partições e métricas inválidas.
 
 Os testes de utilização executam o Streamlit com `AppTest`: abertura sem pesos, upload técnico válido e inválido, controles de processamento/histograma, habilitação do botão ao encontrar pesos, apresentação de respostas de um substituto de teste, invalidação do resultado ao alterar confiança e tratamento de erros. O navegador foi utilizado para conferir a página inicial real; as interações de upload foram verificadas no `AppTest`.
+
+A revisão para hospedagem acrescenta verificação do ZIP em memória, referências dos arquivos exportados, ausência de gravação de resultados no modo hospedado, bloqueio de downloads acima do limite e rejeição de upload maior que o limite configurado. `vercel.json` foi lido como JSON válido, e `git diff --check` não apontou erros. O build do container e o fluxo pela URL pública precisam de validação após a implantação; estes testes locais não comprovam a conclusão do deploy.
 
 ## Limite da validação
 

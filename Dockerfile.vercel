@@ -1,0 +1,29 @@
+FROM python:3.12-slim
+
+WORKDIR /app
+
+# OpenCV usa estas bibliotecas mesmo sem uma janela gráfica no servidor.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libgl1 libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt .
+# A inferência hospedada usa CPU. Evita instalar dependências CUDA desnecessárias.
+RUN python -m pip install --no-cache-dir --index-url https://download.pytorch.org/whl/cpu torch torchvision \
+    && python -m pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    MPLBACKEND=Agg \
+    MPLCONFIGDIR=/tmp/matplotlib \
+    YOLO_CONFIG_DIR=/tmp/ultralytics \
+    YOLO_AUTOINSTALL=false \
+    YOLO_OFFLINE=true \
+    APS_HOSPEDADO=1 \
+    STREAMLIT_BROWSER_GATHER_USAGE_STATS=false
+
+EXPOSE 80
+
+CMD ["sh", "-c", "exec python -m streamlit run app.py --server.address=0.0.0.0 --server.port=${PORT:-80} --server.headless=true --server.maxUploadSize=4"]

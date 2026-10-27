@@ -101,3 +101,41 @@ def test_falha_ao_carregar_pesos_remove_resultado_anterior(app_com_marcador, mon
     assert not app.metric
     assert "resultado_deteccao" not in app.session_state
     assert any("microplásticos" in item.value for item in app.markdown)
+
+
+def test_hospedado_oferece_zip_sem_salvar_no_servidor(app_com_marcador, monkeypatch):
+    monkeypatch.setenv("APS_HOSPEDADO", "1")
+    monkeypatch.setattr(interface_deteccao, "DetectorPlastico", DetectorVisualDouble)
+
+    def nao_salvar(*args, **kwargs):
+        raise AssertionError("A versão hospedada não pode salvar resultados no disco.")
+
+    monkeypatch.setattr(interface_deteccao, "salvar_resultado", nao_salvar)
+    app = AppTest.from_file(str(app_com_marcador), default_timeout=20).run()
+    botao_detectar(app).click().run()
+    assert not app.exception
+    assert not app.error
+    assert not any(botao.label.startswith("Salvar imagens") for botao in app.button)
+    downloads = [item.proto.label for item in app.get("download_button")]
+    assert "Baixar todas as imagens e informações (ZIP)" in downloads
+    assert "Baixar informações JSON" in downloads
+    assert any("a sessão é temporária" in item.value for item in app.caption)
+    assert not (app_com_marcador.parent / "resultados").exists()
+
+
+def test_hospedado_bloqueia_download_grande_sem_alterar_resultado(app_com_marcador, monkeypatch):
+    monkeypatch.setenv("APS_HOSPEDADO", "1")
+    monkeypatch.setattr(interface_deteccao, "DetectorPlastico", DetectorVisualDouble)
+    marcador_grande = b"x" * (4 * 1024 * 1024 + 1)
+    # Marcadores simulam somente tamanho de transporte; nunca são oferecidos como arquivos válidos.
+    monkeypatch.setattr(interface_deteccao, "empacotar_resultado", lambda *args: marcador_grande)
+    monkeypatch.setattr(interface_deteccao, "codificar_png", lambda *args: marcador_grande)
+    app = AppTest.from_file(str(app_com_marcador), default_timeout=20).run()
+    botao_detectar(app).click().run()
+    assert not app.exception
+    assert not app.error
+    assert app.metric[0].value == "1"
+    downloads = [item.proto.label for item in app.get("download_button")]
+    assert downloads == ["Baixar informações JSON"]
+    assert sum("ultrapassa o limite de 4 MB" in item.value for item in app.info) == 2
+    assert not (app_com_marcador.parent / "resultados").exists()

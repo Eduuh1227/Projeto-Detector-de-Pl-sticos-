@@ -45,6 +45,9 @@ PyTorch e outras bibliotecas necessárias ao Ultralytics/Streamlit são resolvid
 aps-plasticos/
 ├── app.py
 ├── requirements.txt
+├── Dockerfile.vercel
+├── .dockerignore
+├── vercel.json
 ├── pytest.ini
 ├── README.md
 ├── VALIDACAO.md
@@ -156,6 +159,22 @@ A comparação de processamento usa uma versão proporcional com até **1600 pix
 Alterar a fotografia, o modelo ou os parâmetros de inferência invalida o resultado anterior na sessão. Os filtros podem ser explorados separadamente, pois não são a entrada do detector. A interface usa CPU por padrão; treino e avaliação permitem selecionar outro dispositivo pela linha de comando.
 
 Uma inferência real que não retorna objetos apresenta contagem zero. Isso não comprova ausência de plástico na fotografia. A confiança apresentada para cada caixa é o escore do modelo e não deve ser chamada de acurácia ou probabilidade calibrada de acerto.
+
+## Hospedagem no Vercel
+
+O projeto inclui `Dockerfile.vercel` e `vercel.json` para executar a mesma interface Streamlit com o **Container Runtime do Vercel**, atualmente em Beta. O container instala as bibliotecas de sistema necessárias ao OpenCV e o PyTorch para CPU. Ele escuta na porta 80, ou na variável `PORT` quando configurada. [Documentação do Container Runtime](https://vercel.com/docs/functions/runtimes/container).
+
+Na importação do repositório no Vercel, selecione a raiz do projeto e o framework **Container**. Não configure uma pasta de saída estática nem use `streamlit run` como comando de build: o processo é iniciado pelo `CMD` do Dockerfile. A publicação usa os arquivos da branch selecionada; datasets, ambientes virtuais e resultados locais ficam fora da imagem de implantação.
+
+O modo hospedado (`APS_HOSPEDADO=1`, configurado no Dockerfile) mantém upload, filtros, segmentação e a mensagem de ausência de modelo. Existem diferenças em relação à execução local:
+
+- **Upload de até 4 MB:** limite conservador abaixo do teto HTTP de 4,5 MB do Vercel. A execução local continua aceitando até 20 MB. [Limites de Functions](https://vercel.com/docs/functions/limitations).
+- **Prévias leves:** as imagens coloridas de exibição são limitadas a 1280 pixels por lado e transmitidas em JPEG; os arrays da análise e os arquivos exportados preservam seus próprios dados e resoluções.
+- **Resultados por download:** quando houver inferência real, a exportação completa é um ZIP montado em memória, sem prometer armazenamento permanente no servidor. Downloads acima de 4 MB são bloqueados com orientação para reduzir a resolução ou usar a versão local; nenhum arquivo é truncado.
+- **Sessão temporária:** reinícios, novas implantações ou reconexões podem exigir novo upload. WebSockets são suportados, mas a conexão termina ao atingir a duração máxima da função; uma nova conexão pode usar outra instância. [WebSockets no Vercel](https://vercel.com/docs/functions/websockets).
+- **Pesos locais ao container:** não há download automático de modelo. Para habilitar detecção futuramente, inclua o checkpoint compatível no processo de implantação e avalie-o antes de apresentar desempenho. O `.gitignore` continua evitando a publicação acidental de pesos pesados.
+
+Treinamento e avaliação devem ser executados no ambiente de desenvolvimento; não são disparados por visitantes do site. A publicação não substitui o treinamento pendente nem produz métricas científicas.
 
 ## Arquitetura e contratos dos módulos
 

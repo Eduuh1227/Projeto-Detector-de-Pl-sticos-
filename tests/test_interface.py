@@ -36,6 +36,19 @@ def test_upload_invalido_mostra_erro_e_mantem_app(monkeypatch, app_temporario):
     assert any("não é uma imagem" in item.value for item in app.error)
 
 
+def test_upload_respeita_limite_da_hospedagem(monkeypatch, app_temporario):
+    original_get_option = st.get_option
+    monkeypatch.setattr(st, "get_option", lambda chave: 4 if chave == "server.maxUploadSize"
+                        else original_get_option(chave))
+    arquivo = SimpleNamespace(name="marcador_tecnico.png",
+                              getvalue=lambda: b"x" * (4 * 1024 * 1024 + 1))
+    monkeypatch.setattr(st, "file_uploader", lambda *args, **kwargs: arquivo)
+    app = AppTest.from_file(str(app_temporario), default_timeout=20).run()
+    assert not app.exception
+    assert any("até 4 MB nesta versão" in item.value for item in app.error)
+    assert any("até 4 MB e 24 megapixels" in item.value for item in app.caption)
+
+
 def test_fluxo_processamento_parametros_e_histograma(monkeypatch, app_temporario, png_bytes):
     arquivo = SimpleNamespace(name="matriz_tecnica.png", getvalue=lambda: png_bytes)
     monkeypatch.setattr(st, "file_uploader", lambda *args, **kwargs: arquivo)
