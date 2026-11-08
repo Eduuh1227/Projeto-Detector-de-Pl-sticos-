@@ -11,6 +11,9 @@ htmlcov/
 .idea/
 .vscode/
 .vercel/
+dados_treinamento*/
+dataset_plasticos.zip
+APS.zip
 *.egg-info/
 build/
 dist/

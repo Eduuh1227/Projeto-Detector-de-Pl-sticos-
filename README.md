@@ -255,6 +255,10 @@ Por padrão, essa chamada exige `train` e `val` com pelo menos uma anotação po
 
 ## Treinamento
 
+**Atualização de 08/11/2026:** os arquivos recebidos em APS.zip foram analisados. As anotações COCO originais estão em `dataset/taco/annotations.json`; as fotos permanecem no arquivo externo, devido ao volume. O preparador revisado usa as fotos fornecidas e corrige a conversão das categorias e caixas antes do treino. Consulte o [roteiro de preparação e treinamento](treinamento/README.md).
+
+[Abrir notebook de treinamento no Google Colab](https://colab.research.google.com/github/Eduuh1227/Projeto-Detector-de-Pl-sticos-/blob/main/notebooks/Treinar_YOLO_Colab.ipynb)
+
 ### Obter os pesos de partida
 
 Escolha um checkpoint de **detecção de objetos** compatível com Ultralytics. Um ponto de partida possível é `yolo11n.pt`, documentado como modelo de detecção na [página oficial do YOLO11](https://docs.ultralytics.com/models/yolo11/). Obtenha esse arquivo explicitamente a partir da fonte oficial e guarde-o, por exemplo, em `modelos/base/yolo11n.pt`.
@@ -401,7 +405,7 @@ Combine mudanças nos contratos dos módulos antes de alterar seus consumidores.
 
 ## Limitações atuais e próximos passos
 
-- **Dados e detector pendentes:** não foram fornecidas fotografias anotadas nem pesos personalizados; não há desempenho de detecção medido nesta entrega.
+- **Detector pendente:** o material TACO fornecido já permite preparar os dados; ainda faltam revisão das anotações, treinamento e avaliação reais. Não há desempenho de detecção medido nem pesos personalizados incluídos.
 - **Aparência não confirma material:** a classificação se baseia em pistas visuais e pode confundir vidro, metal, tecido, vegetação, espuma e outros materiais.
 - **Condições de captura:** objetos pequenos, parcialmente cobertos, submersos, desfocados ou distantes podem não ser detectados.
 - **Segmentação tradicional:** separa intensidades, podendo destacar reflexos, sombras e areia; não identifica plástico.

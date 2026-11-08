@@ -1,5 +1,9 @@
 # Registro de validação do software
 
+## Preparação do material recebido — 08/11/2026
+
+As anotações TACO recebidas foram incorporadas sem alteração de bytes, com SHA-256 registrado em `dataset/taco/PROVENIENCIA.md`. Foram conferidas matematicamente as 2.245 caixas das 24 categorias selecionadas; quatro caixas precisaram de interseção com os limites da imagem. Passaram 5 testes técnicos do novo preparador, incluindo seleção de categorias, geometria e extração seletiva de ZIP. As 10 células de código do notebook foram compiladas para verificar sintaxe; não foram executadas em Colab/GPU e não possuem saídas de treinamento. A decodificação completa das 1.500 fotos e o treinamento permanecem para a execução do roteiro. As verificações anteriores estão registradas abaixo como histórico.
+
 Data: **27/10/2026**. Ambiente: Windows, Python **3.12.14**, CPU.
 
 Este registro descreve verificações do código. Não é uma avaliação científica do detector de plástico.

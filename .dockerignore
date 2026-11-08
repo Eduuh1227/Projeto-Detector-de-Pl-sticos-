@@ -15,4 +15,9 @@ tests
 resultados
 dataset/images
 dataset/labels
+dataset/taco
+dados_treinamento*
+notebooks
+treinamento
+preparar_dataset_taco.py
 *.zip
