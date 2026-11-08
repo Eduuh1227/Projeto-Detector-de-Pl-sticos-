@@ -30,8 +30,8 @@ def mostrar_deteccao(imagem: Imagem, dados: bytes, nome: str,
                      pesos: list[Path], raiz: Path) -> None:
     """Só mantém um resultado enquanto imagem, pesos e parâmetros forem os mesmos."""
     caminho = st.selectbox("Modelo personalizado", pesos, format_func=lambda p: p.name)
-    st.caption("Os pesos devem ter sido treinados para a classe plastico. A presença do arquivo "
-               "não comprova seu desempenho; isso exige avaliação independente.")
+    st.caption("Detector experimental de plástico. Confira visualmente os resultados: "
+               "ele pode deixar resíduos passar ou confundir outros materiais com plástico.")
     c1, c2, c3 = st.columns(3)
     confianca = c1.slider("Confiança mínima", 0.05, 1.0, 0.25, 0.05)
     iou = c2.slider("IoU para pós-processamento do YOLO", 0.05, 1.0, 0.70, 0.05)

@@ -1,5 +1,15 @@
 # Registro de validação do software
 
+## Integração do modelo real — 08/11/2026
+
+O treino foi interrompido a pedido do usuário após 25 épocas completas. O checkpoint da época 24 foi selecionado pela validação, exportado separadamente sem otimizador e incluído em `modelos/plastico_yolo11n_taco.pt`. Os checkpoints de treino permanecem preservados. Os hashes e a origem constam em `modelos/modelo.json`.
+
+A avaliação real nas 150 fotos reservadas para teste, com 221 objetos anotados, retornou precisão 0,4850039821, recall 0,4162895928, mAP50 0,3564273370 e mAP50–95 0,2433127917. Os parâmetros e as limitações estão em `modelos/avaliacao_teste.json`. Durante essa avaliação, o Ultralytics restaurou sete JPEGs sem marcador final na cópia de trabalho; foram registrados os hashes anteriores e posteriores. O arquivo original `APS.zip` não foi alterado.
+
+Na revisão da integração, a suíte completa passou com **129 testes aprovados em 6,79 segundos**. Um teste adicional de utilização executou a interface Streamlit com o detector real em CPU, usando uma cópia reduzida a 1280 pixels de uma fotografia real de validação (`taco_102.jpg`). O botão Detectar resíduos produziu três caixas e os downloads de imagem e JSON. Essa verificação funcional não constitui medida de qualidade do detector. O modelo continua experimental, com erros e omissões.
+
+As versões de inferência foram alinhadas a Ultralytics 8.4.191 e PyTorch 2.14.1. Os registros de 27/10 abaixo descrevem a entrega anterior, quando não havia pesos.
+
 ## Preparação do material recebido — 08/11/2026
 
 As anotações TACO recebidas foram incorporadas sem alteração de bytes, com SHA-256 registrado em `dataset/taco/PROVENIENCIA.md`. Foram conferidas matematicamente as 2.245 caixas das 24 categorias selecionadas; quatro caixas precisaram de interseção com os limites da imagem. Passaram 5 testes técnicos do novo preparador, incluindo seleção de categorias, geometria e extração seletiva de ZIP. As 10 células de código do notebook foram compiladas para verificar sintaxe; não foram executadas em Colab/GPU e não possuem saídas de treinamento. A decodificação completa das 1.500 fotos e o treinamento permanecem para a execução do roteiro. As verificações anteriores estão registradas abaixo como histórico.
@@ -29,7 +39,7 @@ A revisão para hospedagem acrescenta verificação do ZIP em memória, referên
 
 ## Limite da validação
 
-**Não foram executados treinamento, avaliação ou detecção real de plástico.** Nenhum dataset anotado nem checkpoint personalizado foi fornecido. Não há precision, recall, mAP ou acurácia medidos para este projeto.
+**Na entrega de 27/10 não foram executados treinamento, avaliação ou detecção real de plástico.** Naquele momento não havia dataset anotado nem checkpoint personalizado fornecido. A revisão de 08/11 no início deste documento registra o treinamento parcial, a avaliação e a inferência reais posteriores.
 
 As matrizes de pixels, labels e arquivos marcadores dos testes são fixtures técnicas temporárias. Os substitutos do YOLO verificam apenas os contratos entre módulos. Seus valores não representam objetos encontrados em fotografias nem desempenho do modelo. Esses arquivos temporários ficam fora das pastas entregues de dataset/modelos/resultados e não integram o ZIP.
 

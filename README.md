@@ -4,7 +4,7 @@
 
 Aplicação acadêmica em Python para carregar fotografias, comparar técnicas de processamento de imagens e integrar um detector YOLO de resíduos plásticos visíveis.
 
-**Estado da entrega:** a infraestrutura de processamento, interface, treinamento, avaliação e testes está implementada. O projeto é entregue **sem dataset, sem pesos treinados para plástico e sem métricas de desempenho**. O detector ainda precisa ser treinado e avaliado com dados reais. A aplicação abre e permite explorar o processamento mesmo nessa condição.
+**Estado da entrega — 08/11/2026:** detector YOLO11n treinado com o material TACO recebido, interrompido a pedido do usuário após 25 das 50 épocas previstas. O melhor checkpoint da validação (época 24) está incluído em `modelos/plastico_yolo11n_taco.pt` e é carregado pela interface. Nas 150 fotos reservadas para teste: precisão 48,5%, recall 41,6%, mAP50 35,6% e mAP50–95 24,3%. São resultados experimentais; o modelo ainda erra e deixa resíduos passar. Consulte [a documentação do modelo](modelos/README.md) e [as métricas reais](modelos/avaliacao_teste.json). As fotos do dataset e os checkpoints para retomada permanecem fora do Git.
 
 ## Contexto, problema e objetivo
 
@@ -160,15 +160,15 @@ O projeto inclui `Dockerfile.vercel` e `vercel.json` para executar a mesma inter
 
 Na importação do repositório no Vercel, selecione a raiz do projeto e o framework **Container**. Não configure uma pasta de saída estática nem use `streamlit run` como comando de build: o processo é iniciado pelo `CMD` do Dockerfile. A publicação usa os arquivos da branch selecionada; datasets, ambientes virtuais e resultados locais ficam fora da imagem de implantação.
 
-O modo hospedado (`APS_HOSPEDADO=1`, configurado no Dockerfile) mantém upload, filtros, segmentação e a mensagem de ausência de modelo. Existem diferenças em relação à execução local:
+O modo hospedado (`APS_HOSPEDADO=1`, configurado no Dockerfile) mantém upload, filtros, segmentação e detecção com os pesos incluídos. Existem diferenças em relação à execução local:
 
 - **Upload de até 4 MB:** limite conservador abaixo do teto HTTP de 4,5 MB do Vercel. A execução local continua aceitando até 20 MB. [Limites de Functions](https://vercel.com/docs/functions/limitations).
 - **Prévias leves:** as imagens coloridas de exibição são limitadas a 1280 pixels por lado e transmitidas em JPEG; os arrays da análise e os arquivos exportados preservam seus próprios dados e resoluções.
 - **Resultados por download:** quando houver inferência real, a exportação completa é um ZIP montado em memória, sem prometer armazenamento permanente no servidor. Downloads acima de 4 MB são bloqueados com orientação para reduzir a resolução ou usar a versão local; nenhum arquivo é truncado.
 - **Sessão temporária:** reinícios, novas implantações ou reconexões podem exigir novo upload. WebSockets são suportados, mas a conexão termina ao atingir a duração máxima da função; uma nova conexão pode usar outra instância. [WebSockets no Vercel](https://vercel.com/docs/functions/websockets).
-- **Pesos locais ao container:** não há download automático de modelo. Para habilitar detecção futuramente, inclua o checkpoint compatível no processo de implantação e avalie-o antes de apresentar desempenho. O `.gitignore` continua evitando a publicação acidental de pesos pesados.
+- **Pesos locais ao container:** o detector experimental incluído no Git é empacotado na implantação, sem download automático em tempo de execução. O `.gitignore` libera somente esse arquivo de pesos e sua documentação; outros checkpoints continuam ignorados.
 
-Treinamento e avaliação devem ser executados no ambiente de desenvolvimento; não são disparados por visitantes do site. A publicação não substitui o treinamento pendente nem produz métricas científicas.
+Treinamento e avaliação são executados no ambiente de desenvolvimento; não são disparados por visitantes do site. A versão publicada realiza inferência em CPU e não depende da GPU do computador usado no treinamento.
 
 ## Arquitetura e contratos dos módulos
 
@@ -369,7 +369,7 @@ Os testes não precisam de pesos YOLO treinados. As matrizes e os arquivos tempo
 
 A suíte contempla leitura válida e inválida, redimensionamento, cores, filtros, segmentação, ausência e incompatibilidade de modelo, persistência, validação de dados e comportamento da interface. Os testes de Streamlit usam `AppTest`, incluindo upload técnico em memória. Ambientes isolados que bloqueiem sockets locais podem precisar permitir essa comunicação para executar os testes da interface.
 
-Rodar a suíte com sucesso verifica comportamento do software; não valida a qualidade científica das detecções. A avaliação do modelo permanece pendente até existirem dados e pesos reais.
+Rodar a suíte com sucesso verifica comportamento do software; não valida a qualidade científica das detecções. A avaliação real do checkpoint incluído está registrada separadamente em `modelos/avaliacao_teste.json`.
 
 O registro das verificações realizadas na entrega e das versões utilizadas está em [VALIDACAO.md](VALIDACAO.md).
 
@@ -399,13 +399,13 @@ python -m pip check
 
 ## Git e colaboração
 
-O `.gitignore` exclui ambientes virtuais, caches Python, arquivos `.env`, pesos, datasets pesados e resultados gerados. Mantém a configuração YAML, o código, os testes e os marcadores das pastas vazias. Dados e modelos devem ter armazenamento e controle de versão próprios, com referência de origem e hash quando usados em experimentos.
+O `.gitignore` exclui ambientes virtuais, caches Python, arquivos `.env`, datasets pesados, resultados e checkpoints de treino. A exceção explícita é o detector de aproximadamente 5,5 MB incluído para inferência, acompanhado da documentação, hashes e métricas. Mantém também a configuração YAML, as anotações COCO originais, o código e os testes.
 
 Combine mudanças nos contratos dos módulos antes de alterar seus consumidores. Para comparar experimentos, preserve o dataset, o split, os parâmetros, as versões e os checkpoints utilizados. Não sobrescreva a partição de teste para melhorar artificialmente a avaliação.
 
 ## Limitações atuais e próximos passos
 
-- **Detector pendente:** o material TACO fornecido já permite preparar os dados; ainda faltam revisão das anotações, treinamento e avaliação reais. Não há desempenho de detecção medido nem pesos personalizados incluídos.
+- **Detector experimental:** treinado por 25 épocas e avaliado nas 150 fotos de teste. O desempenho ainda é limitado. A revisão visual das anotações, a divisão por cenas e a avaliação em novas praias e rios são necessárias para afirmar generalização.
 - **Aparência não confirma material:** a classificação se baseia em pistas visuais e pode confundir vidro, metal, tecido, vegetação, espuma e outros materiais.
 - **Condições de captura:** objetos pequenos, parcialmente cobertos, submersos, desfocados ou distantes podem não ser detectados.
 - **Segmentação tradicional:** separa intensidades, podendo destacar reflexos, sombras e areia; não identifica plástico.
@@ -413,6 +413,6 @@ Combine mudanças nos contratos dos módulos antes de alterar seus consumidores.
 - **Sem microplásticos:** o sistema não realiza análise microscópica, laboratorial ou química.
 - **Sem comparação experimental de filtros:** a interface permite observação; qualquer conclusão de superioridade exige protocolo e medições reais.
 
-Próximos passos da equipe: definir o protocolo de anotação, coletar e revisar dados autorizados, separar partições, treinar o modelo, examinar erros na validação, registrar a avaliação final no teste e documentar limitações observadas. Estudos futuros podem comparar o efeito dos filtros sobre a detecção sob condições controladas, mantendo o mesmo protocolo de avaliação.
+Próximos passos da equipe: revisar anotações e erros, coletar dados autorizados mais representativos e separar novas partições por cena para evitar fotos semelhantes entre treino e teste. A continuação do treinamento depende de nova autorização; os checkpoints originais foram preservados. Estudos futuros podem comparar o efeito dos filtros sobre a detecção sob condições controladas, mantendo o mesmo protocolo de avaliação.
 
 Para expandir para garrafas, sacolas, copos/recipientes, embalagens e outros resíduos, será necessário definir classes mutuamente claras, revisar/reanotar o dataset, atualizar `nc` e `names`, treinar novos pesos e adaptar o mapeamento esperado pela interface. `DetectorPlastico` aceita um mapeamento de classes explícito para essa extensão; a interface entregue mantém o contrato de uma classe. A expansão não é necessária para executar o MVP.

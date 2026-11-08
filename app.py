@@ -53,6 +53,8 @@ def main() -> None:
         st.header("Etapa 2 — Detecção")
         if not list((RAIZ / "modelos").glob("*.pt")):
             st.info(MENSAGEM_SEM_MODELO)
+        else:
+            st.success("Modelo treinado disponível. Envie uma fotografia para detectar resíduos plásticos.")
     informacoes_academicas(etapa=4 if entrada is not None else 3)
 
 

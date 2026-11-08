@@ -1,0 +1,106 @@
+{
+  "tipo": "avaliacao_real_yolo",
+  "inicio_utc": "2026-11-08T21:33:28.716792+00:00",
+  "fim_utc": "2026-11-08T21:34:01.166499+00:00",
+  "sha256_pesos": "36ae59c1bcedbfd6abdd3d9c37b175f6993239ea9fa46f5901006f8b4a2bb99a",
+  "split": "test",
+  "metricas": {
+    "precision": 0.4850039821231554,
+    "recall": 0.416289592760181,
+    "mAP50": 0.35642733704223856,
+    "mAP50-95": 0.24331279167920178
+  },
+  "escala_metricas": "0 a 1",
+  "parametros": {
+    "split": "test",
+    "imgsz": 640,
+    "batch": 4,
+    "device": "0",
+    "conf": 0.001,
+    "iou": 0.7,
+    "workers": 0,
+    "plots": false,
+    "save_json": false,
+    "save_txt": false,
+    "half": false
+  },
+  "versoes": {
+    "python": "3.12.14",
+    "ultralytics": "8.4.191",
+    "torch": "2.14.1+cu130",
+    "numpy": "2.5.4",
+    "opencv-python": "4.14.0.94",
+    "PyYAML": "6.0.3"
+  },
+  "interpretacao": {
+    "precision_recall": "Resumos agregados fornecidos pelo YOLO; não são confiança de uma caixa.",
+    "mAP50": "AP média com limiar de IoU 0,50.",
+    "mAP50-95": "AP média nos limiares de IoU 0,50 a 0,95, passo 0,05.",
+    "limite": "Válido para o conjunto e os parâmetros registrados; não comprova desempenho em outros ambientes."
+  },
+  "dataset": {
+    "sha256_conjunto": "58c60e9a8d0f3813c65a4d999661627b4a1f11a23694d59f0ee863a3bddddd4e",
+    "contagens": {
+      "train": {
+        "imagens": 1050,
+        "objetos": 1509,
+        "negativos": 258
+      },
+      "val": {
+        "imagens": 300,
+        "objetos": 515,
+        "negativos": 75
+      },
+      "test": {
+        "imagens": 150,
+        "objetos": 221,
+        "negativos": 34
+      }
+    },
+    "classes": {
+      "0": "plastico"
+    },
+    "reparos_jpeg_ultralytics": {
+      "observacao": "O avaliador Ultralytics detectou JPEGs sem marcador final e os restaurou automaticamente na cópia de trabalho antes da inferência. As fotos originais no APS.zip permanecem intactas. O sha256_conjunto identifica a validação anterior a esses reparos.",
+      "quantidade": 7,
+      "arquivos": [
+        {
+          "imagem": "taco_228.jpg",
+          "sha256_antes": "6a739187c8def10c3f6ad4802298d1a6e021792b118d3258b01edb9afacfef97",
+          "sha256_depois": "addf5e2bd74f961c1ad69077188a17db127c4a053ad9a0d2de7dc9215e2b05a4"
+        },
+        {
+          "imagem": "taco_234.jpg",
+          "sha256_antes": "021ad8cffee5fac22124862cd2fb4a1e9bb73e963e055999fd83da1aa34a2d91",
+          "sha256_depois": "7b3e5af8d6c392b5bc6a6cf3b90c0f4d27171e2fe4407892ca1f8b3f39917671"
+        },
+        {
+          "imagem": "taco_318.jpg",
+          "sha256_antes": "69d815abe87122e5825c7ded831a944fa6a055c89a37f048b12083aab6e656c7",
+          "sha256_depois": "8f94f2eaa2b425277301e16707f6502647c8245c1155e9a656219f0ca08a6a40"
+        },
+        {
+          "imagem": "taco_326.jpg",
+          "sha256_antes": "6e63ec3de5aec80c56f3689e00ab9cd9a97f64b8ca3be5415d4504648dcc0dc6",
+          "sha256_depois": "bcf8ff3ff0728f4b2a0c2f38a1a4bf431a9c9b2dd9de30b81b9bb488a4fbacad"
+        },
+        {
+          "imagem": "taco_327.jpg",
+          "sha256_antes": "b79d0694816d1f230390c7f1f46266260c6a238de4ea6ba1c244972b9c19c8d9",
+          "sha256_depois": "1c611dd813b21954069c60e880711cd2722fb3264efc40bccf3cc991d25d0237"
+        },
+        {
+          "imagem": "taco_333.jpg",
+          "sha256_antes": "1a6999af107e15328e3dd61c7e059eb46e0f70e70e86424a088133a44289ecf9",
+          "sha256_depois": "67d157c7c0705654aa49f9fb99851adb98d945f6fac9e50b7908d9ada2541960"
+        },
+        {
+          "imagem": "taco_334.jpg",
+          "sha256_antes": "9fdca9898bd0b349bbe4d1f0ecb24217c099f81330c16d8a65b7b343340f6c08",
+          "sha256_depois": "d0553d31646bbd02b981b0f2ea577fb108128ae8fca9a07d83e3c3e973a3b7ff"
+        }
+      ]
+    }
+  },
+  "observacao": "Checkpoint selecionado pela validação após 25 épocas completas. Avaliação nas 150 fotos reservadas de TACO, sem ajuste de parâmetros pelo teste. A divisão recebida é aleatória; cenas semelhantes e anotações incompletas podem limitar a generalização para novas praias e rios."
+}

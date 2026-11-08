@@ -34,3 +34,7 @@ resultados/**/*
 modelos/**/*
 !modelos/**/
 !modelos/.gitkeep
+!modelos/plastico_yolo11n_taco.pt
+!modelos/modelo.json
+!modelos/avaliacao_teste.json
+!modelos/README.md

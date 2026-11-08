@@ -1,0 +1,23 @@
+{
+  "arquivo": "plastico_yolo11n_taco.pt",
+  "arquitetura": "YOLO11n",
+  "classe": {
+    "0": "plastico"
+  },
+  "epoca_selecionada": 24,
+  "epocas_concluidas": 25,
+  "epocas_planejadas": 50,
+  "criterio": "Melhor checkpoint segundo a validação, sem seleção pelo teste",
+  "sha256_checkpoint_original": "67f08656c7be0e5baf5454e4c5dd530b3e7d673e1e4570587ed2a1a19de80c51",
+  "sha256_pesos": "36ae59c1bcedbfd6abdd3d9c37b175f6993239ea9fa46f5901006f8b4a2bb99a",
+  "sha256_anotacoes_taco": "812c2e3f0d336b437f276597715de2abb08bb8a641599c45f593d233ec66457b",
+  "imagens": {
+    "train": 1050,
+    "val": 300,
+    "test": 150
+  },
+  "ultralytics": "8.4.191",
+  "torch_treino": "2.14.1+cu130",
+  "exportacao": "Checkpoint EMA em FP16 sem otimizador; inferência no site em CPU.",
+  "limites": "Uso acadêmico experimental; pode omitir plásticos e marcar outros materiais. Não detecta microplásticos."
+}

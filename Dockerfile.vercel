@@ -9,7 +9,7 @@ RUN apt-get update \
 
 COPY requirements.txt .
 # A inferência hospedada usa CPU. Evita instalar dependências CUDA desnecessárias.
-RUN python -m pip install --no-cache-dir --index-url https://download.pytorch.org/whl/cpu torch torchvision \
+RUN python -m pip install --no-cache-dir --index-url https://download.pytorch.org/whl/cpu torch==2.14.1 torchvision==0.29.1 \
     && python -m pip install --no-cache-dir -r requirements.txt
 
 COPY . .
