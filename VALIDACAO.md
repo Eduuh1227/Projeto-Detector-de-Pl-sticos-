@@ -1,5 +1,15 @@
 # Registro de validação do software
 
+## Publicação experimental do reforçado — 09/11/2026
+
+A pedido do usuário, foi incluído o arquivo de inferência `modelos/plastico_yolo11n_reforco.pt`, selecionado a partir de `last.pt` da terceira rodada, época 15. SHA-256: `6dd4d36025177374cda833c16b545ef72becbc0bd356a20dba6a6791be8a3648`. O modelo anterior foi preservado, e a interface oferece seleção entre **Reforçado — experimental** e **Anterior — TACO**, com o reforçado inicialmente selecionado.
+
+O treinamento adicional completou três rodadas de 15 épocas. A checagem final detectou os três objetos visuais de referência, mas não superou o critério geral: nas 300 fotos TACO de validação teve 189 acertos, 194 marcações sem correspondência, 326 omissões e F1 42,09%, contra 43,03% da referência de 50 épocas. A versão é publicada como experimental para testes, com aviso visível, sem afirmar aprovação de qualidade geral. Os dados, os critérios conhecidos de desenvolvimento e as limitações estão em `treinamento/REFORCO.md` e `modelos/avaliacao_reforco.json`.
+
+A suíte completa passou com **129 testes aprovados em 8,83 segundos**. Uma verificação adicional executou a interface real em CPU com as três imagens fornecidas, sem substituir o detector: cada uma retornou uma marcação, com IoUs de referência aproximados 0,875, 0,708 e 0,941. Foram conferidos o hash do modelo carregado, os downloads de imagem/JSON/ZIP e a remoção do resultado anterior ao trocar o seletor para a versão antiga. Essa verificação funcional não comprova desempenho em novas imagens. As fotos fornecidas não foram adicionadas ao Git nem ao treino.
+
+Os registros anteriores abaixo descrevem versões anteriores do projeto.
+
 ## Integração do modelo real — 08/11/2026
 
 O treino foi interrompido a pedido do usuário após 25 épocas completas. O checkpoint da época 24 foi selecionado pela validação, exportado separadamente sem otimizador e incluído em `modelos/plastico_yolo11n_taco.pt`. Os checkpoints de treino permanecem preservados. Os hashes e a origem constam em `modelos/modelo.json`.

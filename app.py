@@ -55,6 +55,9 @@ def main() -> None:
             st.info(MENSAGEM_SEM_MODELO)
         else:
             st.success("Modelo treinado disponível. Envie uma fotografia para detectar resíduos plásticos.")
+            if (RAIZ / "modelos" / "plastico_yolo11n_reforco.pt").is_file():
+                st.caption("A versão reforçada está disponível para testes. Após enviar uma foto, "
+                           "você poderá compará-la com o modelo anterior.")
     informacoes_academicas(etapa=4 if entrada is not None else 3)
 
 

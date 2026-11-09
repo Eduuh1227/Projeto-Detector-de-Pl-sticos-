@@ -29,9 +29,16 @@ def mostrar_deteccao(imagem: Imagem, dados: bytes, nome: str,
                      processadas: dict, parametros: dict,
                      pesos: list[Path], raiz: Path) -> None:
     """Só mantém um resultado enquanto imagem, pesos e parâmetros forem os mesmos."""
-    caminho = st.selectbox("Modelo personalizado", pesos, format_func=lambda p: p.name)
-    st.caption("Detector experimental de plástico. Confira visualmente os resultados: "
-               "ele pode deixar resíduos passar ou confundir outros materiais com plástico.")
+    pesos = sorted(pesos, key=lambda p: (p.name != "plastico_yolo11n_reforco.pt", p.name))
+    nomes = {"plastico_yolo11n_reforco.pt": "Reforçado — experimental",
+             "plastico_yolo11n_taco.pt": "Anterior — TACO"}
+    caminho = st.selectbox("Modelo personalizado", pesos, format_func=lambda p: nomes.get(p.name, p.name))
+    if caminho.name == "plastico_yolo11n_reforco.pt":
+        st.warning("Modelo reforçado em teste. Detectou os três objetos de referência, mas ainda "
+                   "tem omissões e marcações erradas em outras fotos. Compare com o modelo anterior.")
+    else:
+        st.caption("Detector experimental de plástico. Confira visualmente os resultados: "
+                   "ele pode deixar resíduos passar ou confundir outros materiais com plástico.")
     c1, c2, c3 = st.columns(3)
     confianca = c1.slider("Confiança mínima", 0.05, 1.0, 0.25, 0.05)
     iou = c2.slider("IoU para pós-processamento do YOLO", 0.05, 1.0, 0.70, 0.05)

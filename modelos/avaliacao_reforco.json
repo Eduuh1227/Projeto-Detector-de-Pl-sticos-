@@ -1,0 +1,106 @@
+{
+  "tipo": "checagem_desenvolvimento_e_validacao",
+  "sha256_pesos_publicados": "6dd4d36025177374cda833c16b545ef72becbc0bd356a20dba6a6791be8a3648",
+  "referencias_tres_imagens": [
+    {
+      "imagem": 1,
+      "sha256_imagem": "37c0358de14aabc696c51fac31b29c2826ff6c2644c3f590346753bd56516a0e",
+      "referencia_visual_aproximada": [
+        189.0,
+        29.0,
+        270.0,
+        89.0
+      ],
+      "iou_maximo_referencia": 0.8745463519112885,
+      "criterio_atendido": true,
+      "deteccoes": [
+        {
+          "classe_id": 0,
+          "classe": "plastico",
+          "confianca": 0.4185428023338318,
+          "caixa_xyxy": [
+            186.94862365722656,
+            28.00774574279785,
+            266.4374084472656,
+            92.15506744384766
+          ]
+        }
+      ]
+    },
+    {
+      "imagem": 2,
+      "sha256_imagem": "881694a44858aa8ff9f3f17504eb592e95fe64e60edc59132988408d4ac5f819",
+      "referencia_visual_aproximada": [
+        69.0,
+        58.0,
+        445.0,
+        186.0
+      ],
+      "iou_maximo_referencia": 0.7077092772147433,
+      "criterio_atendido": true,
+      "deteccoes": [
+        {
+          "classe_id": 0,
+          "classe": "plastico",
+          "confianca": 0.3517780601978302,
+          "caixa_xyxy": [
+            61.63459777832031,
+            60.523536682128906,
+            458.8787841796875,
+            225.95262145996094
+          ]
+        }
+      ]
+    },
+    {
+      "imagem": 3,
+      "sha256_imagem": "e84b30ff5a0db27ae0fb63233c6dad2f4f7531d0dbe902cbe0ee29bc67d6849a",
+      "referencia_visual_aproximada": [
+        121.0,
+        172.0,
+        257.0,
+        237.0
+      ],
+      "iou_maximo_referencia": 0.9406654014884501,
+      "criterio_atendido": true,
+      "deteccoes": [
+        {
+          "classe_id": 0,
+          "classe": "plastico",
+          "confianca": 0.6816492080688477,
+          "caixa_xyxy": [
+            119.8741683959961,
+            169.50604248046875,
+            257.5827941894531,
+            237.7487030029297
+          ]
+        }
+      ]
+    }
+  ],
+  "protocolo": {
+    "confianca": 0.25,
+    "iou_nms": 0.7,
+    "imgsz": 640,
+    "device": "cpu"
+  },
+  "validacao_taco_300_fotos": {
+    "tp": 189,
+    "fp": 194,
+    "fn": 326,
+    "precision": 0.4934725848563969,
+    "recall": 0.36699029126213595,
+    "f1": 0.4209354120267261,
+    "f1_modelo_50_epocas": 0.43028846153846156,
+    "criterio_atendido": false,
+    "metodo": "300 fotos TACO val, IoU mínimo 0,50, limiar 0,25; guardrail contra regressão, não teste final."
+  },
+  "referencia_modelo_50_epocas": {
+    "tp": 179,
+    "fp": 138,
+    "fn": 336,
+    "f1": 0.43028846153846156,
+    "observacao": "O modelo de 50 épocas é a referência da comparação; o modelo anterior mantido no seletor é o que foi publicado após 25 épocas."
+  },
+  "observacao": "Referências visuais aproximadas, não labels de treino. O conjunto de teste de 150 fotos não foi reutilizado para ajustar esta versão. Não há mAP de teste final medido para o modelo reforçado."
+}

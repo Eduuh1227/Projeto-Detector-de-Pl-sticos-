@@ -38,3 +38,6 @@ modelos/**/*
 !modelos/modelo.json
 !modelos/avaliacao_teste.json
 !modelos/README.md
+!modelos/plastico_yolo11n_reforco.pt
+!modelos/reforco.json
+!modelos/avaliacao_reforco.json

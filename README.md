@@ -4,7 +4,11 @@
 
 Aplicação acadêmica em Python para carregar fotografias, comparar técnicas de processamento de imagens e integrar um detector YOLO de resíduos plásticos visíveis.
 
-**Estado da entrega — 08/11/2026:** detector YOLO11n treinado com o material TACO recebido, interrompido a pedido do usuário após 25 das 50 épocas previstas. O melhor checkpoint da validação (época 24) está incluído em `modelos/plastico_yolo11n_taco.pt` e é carregado pela interface. Nas 150 fotos reservadas para teste: precisão 48,5%, recall 41,6%, mAP50 35,6% e mAP50–95 24,3%. São resultados experimentais; o modelo ainda erra e deixa resíduos passar. Consulte [a documentação do modelo](modelos/README.md) e [as métricas reais](modelos/avaliacao_teste.json). As fotos do dataset e os checkpoints para retomada permanecem fora do Git.
+**Estado da entrega — 09/11/2026:** há dois modelos disponíveis na interface: **Reforçado — experimental**, selecionado inicialmente para testes, e **Anterior — TACO**, preservado para comparação. O reforçado foi disponibilizado a pedido do usuário após 50 épocas iniciais e mais 45 de reforço, com fotos reais anotadas de garrafas em rios e recortes do TACO. Na checagem final ele marcou os três objetos de referência fornecidos pelo usuário; isso não significa marcar todos os resíduos das fotos. Essas três imagens ficaram fora do treino, mas são critérios conhecidos de desenvolvimento, não teste independente.
+
+Nas 300 fotos TACO de validação, em confiança 0,25 e IoU mínimo de correspondência 0,50, o reforçado encontrou 189 objetos e produziu 194 marcações sem correspondência, com F1 de 42,09%, contra 43,03% do modelo de 50 épocas. **Não passou no critério automático de qualidade geral** e está disponível como experimental, sem prometer superioridade geral. O seletor mantém a versão anteriormente publicada após 25 épocas; ela é diferente da referência de 50 épocas usada nessa comparação.
+
+Consulte [os modelos e suas limitações](modelos/README.md), [a avaliação do reforçado](modelos/avaliacao_reforco.json) e [o protocolo de reforço](treinamento/REFORCO.md). As métricas de teste em `modelos/avaliacao_teste.json` pertencem somente ao modelo anterior; não foram reapresentadas como desempenho do reforçado. Fotos do dataset e checkpoints de treinamento permanecem fora do Git.
 
 ## Contexto, problema e objetivo
 
@@ -166,7 +170,7 @@ O modo hospedado (`APS_HOSPEDADO=1`, configurado no Dockerfile) mantém upload, 
 - **Prévias leves:** as imagens coloridas de exibição são limitadas a 1280 pixels por lado e transmitidas em JPEG; os arrays da análise e os arquivos exportados preservam seus próprios dados e resoluções.
 - **Resultados por download:** quando houver inferência real, a exportação completa é um ZIP montado em memória, sem prometer armazenamento permanente no servidor. Downloads acima de 4 MB são bloqueados com orientação para reduzir a resolução ou usar a versão local; nenhum arquivo é truncado.
 - **Sessão temporária:** reinícios, novas implantações ou reconexões podem exigir novo upload. WebSockets são suportados, mas a conexão termina ao atingir a duração máxima da função; uma nova conexão pode usar outra instância. [WebSockets no Vercel](https://vercel.com/docs/functions/websockets).
-- **Pesos locais ao container:** o detector experimental incluído no Git é empacotado na implantação, sem download automático em tempo de execução. O `.gitignore` libera somente esse arquivo de pesos e sua documentação; outros checkpoints continuam ignorados.
+- **Pesos locais ao container:** os dois detectores incluídos no Git são empacotados na implantação, sem download automático em tempo de execução. O `.gitignore` libera somente esses arquivos de inferência e sua documentação; outros checkpoints continuam ignorados.
 
 Treinamento e avaliação são executados no ambiente de desenvolvimento; não são disparados por visitantes do site. A versão publicada realiza inferência em CPU e não depende da GPU do computador usado no treinamento.
 
@@ -399,13 +403,13 @@ python -m pip check
 
 ## Git e colaboração
 
-O `.gitignore` exclui ambientes virtuais, caches Python, arquivos `.env`, datasets pesados, resultados e checkpoints de treino. A exceção explícita é o detector de aproximadamente 5,5 MB incluído para inferência, acompanhado da documentação, hashes e métricas. Mantém também a configuração YAML, as anotações COCO originais, o código e os testes.
+O `.gitignore` exclui ambientes virtuais, caches Python, arquivos `.env`, datasets pesados, resultados e checkpoints de treino. As exceções explícitas são os dois detectores de aproximadamente 5,5 MB cada para inferência, acompanhados da documentação, hashes e avaliações. Mantém também a configuração YAML, as anotações COCO originais, o código e os testes.
 
 Combine mudanças nos contratos dos módulos antes de alterar seus consumidores. Para comparar experimentos, preserve o dataset, o split, os parâmetros, as versões e os checkpoints utilizados. Não sobrescreva a partição de teste para melhorar artificialmente a avaliação.
 
 ## Limitações atuais e próximos passos
 
-- **Detector experimental:** treinado por 25 épocas e avaliado nas 150 fotos de teste. O desempenho ainda é limitado. A revisão visual das anotações, a divisão por cenas e a avaliação em novas praias e rios são necessárias para afirmar generalização.
+- **Detectores experimentais:** a versão anterior foi publicada após 25 épocas; o reforçado após 95 épocas no total, incluindo novos recortes reais. A versão reforçada detectou os três objetos de desenvolvimento, mas não superou o critério de F1 geral da referência de 50 épocas. A revisão visual das anotações, a divisão por cenas e a avaliação em novas praias e rios são necessárias para afirmar generalização.
 - **Aparência não confirma material:** a classificação se baseia em pistas visuais e pode confundir vidro, metal, tecido, vegetação, espuma e outros materiais.
 - **Condições de captura:** objetos pequenos, parcialmente cobertos, submersos, desfocados ou distantes podem não ser detectados.
 - **Segmentação tradicional:** separa intensidades, podendo destacar reflexos, sombras e areia; não identifica plástico.

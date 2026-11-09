@@ -1,0 +1,32 @@
+{
+  "arquivo": "plastico_yolo11n_reforco.pt",
+  "sha256_pesos": "6dd4d36025177374cda833c16b545ef72becbc0bd356a20dba6a6791be8a3648",
+  "arquitetura": "YOLO11n",
+  "classes": {
+    "0": "plastico"
+  },
+  "data_publicacao": "2026-11-09",
+  "status": "experimental_disponibilizado_a_pedido_do_usuario",
+  "selecionado": "last.pt da rodada 3, época 15, que detectou os três objetos de referência; não é o melhor modelo geral segundo o critério de aprovação",
+  "epocas_anteriores": 50,
+  "epocas_reforco": 45,
+  "epocas_totais": 95,
+  "sha256_pesos_iniciais": "d5e2750e8a00d34f047037cb9236646afd6f73db2b272e6e291072e1de9d1ab3",
+  "sha256_checkpoint_checagem_antes_strip_optimizer": "063d1f6b043978480f6453cf52d0af7133bb6847ad3f73aad12c521fa9aefcdb",
+  "dataset_imagens": {
+    "train": 1771,
+    "val": 368,
+    "test_reservado": 150
+  },
+  "dados_externos": {
+    "fonte": "https://github.com/m0-n/Plastic-Bottles-Dataset",
+    "commit": "76b84abc4c8180f7ee0a67abfee917185d925776",
+    "licenca_declarada_pelo_autor": "Dominio publico conforme README da fonte",
+    "recortes_reais_train": 398,
+    "recortes_reais_val": 68
+  },
+  "recortes_taco_train": 323,
+  "tres_imagens_usuario_no_treino": false,
+  "criterio_automatico_qualidade_geral_atendido": false,
+  "limitacoes": "As três imagens são critérios conhecidos de desenvolvimento; não são teste independente. O modelo pode omitir plásticos, marcar outros materiais e deixar parte dos resíduos de uma foto sem marcação. Não identifica material quimicamente nem detecta microplásticos."
+}
